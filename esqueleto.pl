@@ -1,0 +1,91 @@
+:- dynamic(diccionario/1).
+
+% Dado un nombre de archivo que contiene todas las palabras que se quieren
+% agregar al diccionario (una por linea), vacia diccionario/1 y agrega
+% las definiciones nuevas
+
+cargar(NombreDeArchivo) :-
+  retractall(diccionario(_)),
+  atom_codes(NombreDeArchivo, Arch),
+  open(Arch, read, Str),
+  read_file(Str,_),
+  close(Str).
+
+read_file(Stream,[]) :- at_end_of_stream(Stream).
+read_file(Stream,[X|L]) :-
+    not(at_end_of_stream(Stream)),
+    read_line_to_codes(Stream,Codes),
+    string_codes(X, Codes),
+    assertz(diccionario(X)),
+    read_file(Stream,L), !.
+
+
+% listar mensajes secretos de ejemplo.
+ej(1, [rombo, cuadrado, espacio, perro, cuadrado, sol, cuadrado]).
+% solo debería ser "la cosa" porque cuadrado != triangulo
+ej(2, [rombo, cuadrado, espacio, perro, triangulo, sol, cuadrado]).
+
+ej(3, [rombo, cuadrado, perro, cuadrado, sol, luna, triangulo, estrella, arbol, gato]).
+
+% Ejercicio 1 %
+% diccionario_lista(-S) %
+diccionario_lista(S) :- diccionario(D), string_codes(D, S).
+
+% Ejercicio 2 %
+% juntar_con(L, J, R) %
+juntar_con([X], _, X).
+juntar_con([X|Xs], J, R) :- juntar_con(Xs, J, R2), append(X, [J|R2], R).
+
+% Ejercicio 3 %
+% palabras(S, P) %
+
+ej(4, [rombo, espacio, perro, espacio, sol, luna, espacio, estrella, espacio, arbol, espacio, gato]).
+
+palabras([], []).
+palabras(S, P) :- append(PRE, [espacio|TPRE], S), not(member(espacio, PRE)), palabras(TPRE, P2), append([PRE], P2, P).
+palabras(S, [S]) :- not(member(espacio, S)).
+
+% Ejercicio 4 %
+% asignar_var(+A, MI, MF) %
+
+asignar_var(Atomo, MI, [(Atomo, _) | MI]) :- not((member((Atomo, _), MI))).
+asignar_var(Atomo, MI, MI) :- member((Atomo, _), MI).
+
+% ¿por que funciona asignar var/3? Porque si.
+% Ejercicio 5 %
+palabras_con_variables(S, V) :- diccionario_var(S, D), palabras_con_variables_y_dicc(S, D, V).
+
+palabras_con_variables_y_dicc([], DICC, []).
+palabras_con_variables_y_dicc([ [] | XSS], DICC, [[]|YSS]):- palabras_con_variables_y_dicc( XSS, DICC, YSS).
+palabras_con_variables_y_dicc([ [X | XS] | XSS], DICC, [ [Y | YS] | YSS]) :-
+member((X, Y), DICC), palabras_con_variables_y_dicc( [XS | XSS], DICC, [YS | YSS] ).
+
+diccionario_var([], []).
+diccionario_var([ [] | XSS], DICC) :- diccionario_var(XSS, DICC).
+diccionario_var([ [X | XS] | XSS], DICC) :- diccionario_var([XS|XSS], DICC2), asignar_var(X, DICC2, DICC).
+
+
+% Ejercicio 6 %
+% quitar(?E, +L, -R) %
+
+quitar(_,[],[]).
+quitar(E, [X|XS], R) :- X==E, quitar(E, XS, R). 
+quitar(E, [X|XS], [X|R] ) :- not(X == E), quitar(E, XS, R).  %por que anda?
+
+
+% Ejercicio 7 %
+% cant_distintos(L, S) %
+
+cant_distintos([], 0).
+cant_distintos([X|XS], N) :- quitar(X, XS, XSsinX), cant_distintos(XSsinX, N2), N is N2+1.
+
+
+
+asignar([]).
+asignar([XS|XSS]) :- diccionario_lista(YS), XS = YS , asignar(XSS).
+
+descifrar(CIFER, MSJ) :-  palabras(CIFER, P), palabras_con_variables(P, VARS), asignar(VARS), toString(VARS, MSJ) .
+
+toString([], S) :- string_codes(S, []).
+toString([XS|XSS], S) :- string_codes(S1, XS), toString(XSS, S2), string_concat(S1, S2, S).
+
