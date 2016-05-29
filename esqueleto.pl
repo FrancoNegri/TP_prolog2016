@@ -91,12 +91,27 @@ cant_distintos([X|XS], N) :- quitar(X, XS, XSsinX), cant_distintos(XSsinX, N2), 
 
 
 % Ejercicio 8 %
+descifrar(CIFER, MSJ) :- palabras(CIFER, P), palabras_con_variables(P, VARS), flatten(VARS, VARSFLAT), sacar_repe(VARSFLAT, VARSNOREP), asignar(VARS), todos_distintos(VARSNOREP), to_string(VARS, MSJ).
+
+sacar_repe([], []).
+sacar_repe([X|XS], YS) :- quitar(X, XS, XSX), sacar_repe(XSX, REC), append([X], REC, YS).
+
 asignar([]).
 asignar([XS|XSS]) :- diccionario_lista(YS), XS = YS, asignar(XSS).
 
-descifrar(CIFER, MSJ) :- palabras(CIFER, P), palabras_con_variables(P, VARS), asignar(VARS), toString(VARS, MSJ).
+todos_distintos(XS) :- sacar_repe(XS, XS).
 
-toString([], S) :- string_codes(S, []).
-toString([XS|XSS], S) :- string_codes(S1, XS), toString(XSS, S2), string_concat(S1, S2, S).
+to_string([], S) :- string_codes(S, []).
+to_string([XS], S) :- string_codes(S, XS).
+to_string([XS|XSS], S) :- length(XSS, N), N > 0, string_codes(S1, XS), to_string(XSS, S2), string_concat(" ", S2, S3), string_concat(S1, S3, S).
 
-% Falta agregarle los espacios al resultado %
+
+% Ejercicio 9 %
+descifrar_sin_espacios(XS, M) :- meter_espacios(XS, CIFER), descifrar(CIFER, M).
+
+meter_espacios([X], [X]).
+meter_espacios([X|XS], YS) :- meter_espacios(XS, REC), append([X, espacio], REC, YS).
+meter_espacios([X|XS], YS) :- meter_espacios(XS, REC), append([X], REC, YS).
+
+
+% Ejercicio 10 %
