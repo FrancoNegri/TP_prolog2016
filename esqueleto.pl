@@ -115,3 +115,52 @@ meter_espacios([X|XS], YS) :- meter_espacios(XS, REC), append([X], REC, YS).
 
 
 % Ejercicio 10 %
+
+mensajes_mas_parejos(XS, M, DESV) :- meter_espacios(XS, CIFER),lenPalabras(CIFER, LEN),stddev(LEN, DESV), descifrar(CIFER, M).
+
+%DESV para ver los desvios estandar.
+
+lenPalabras([],[0]).
+lenPalabras([espacio|Xs],[0|Rec]):-lenPalabras(Xs,Rec).
+lenPalabras([X|Xs],[Len|Y]):- X \= espacio, lenPalabras(Xs,[LenRec|Y]), Len is LenRec + 1.
+
+stddev(List, STddev) :- length(List,N),
+                        sum(List,Sum),
+                        squares(List,SqList),
+                        sum(SqList,SumSquares),
+                        variance(N,Sum,SumSquares,Varnaice),
+                        STddev = sqrt(Varnaice).
+
+variance(N,_,_;0):- N =< 1, !.
+variance(N,Sum,SumSq,Variance):-
+    Variance is (SumSq - (Sum+Sum/N)) /(N-1).
+
+sum([],0).
+sum([X|Xs],Res):- sum(Xs,REC), Res is REC +1.
+
+squares([],[]).
+squares([X|Xs],[Y|Ys]):- squares(Xs,Ys), Y is X*X.
+
+
+
+lenPalabras([],[0]).
+lenPalabras([espacio|Xs],[0|Rec]):-lenPalabras(Xs,Rec).
+lenPalabras([X|Xs],[Len|Y]):- X \= espacio, lenPalabras(Xs,[LenRec|Y]), Len is LenRec + 1.
+
+stddev(List, STddev) :- length(List,N),
+                        sum(List,Sum),
+                        squares(List,SqList),
+                        sum(SqList,SumSquares),
+                        variance(N,Sum,SumSquares,Varnaice),
+                        STddev = sqrt(Varnaice).
+
+variance(N,_,_;0):- N =< 1, !.
+variance(N,Sum,SumSq,Variance):-
+    Variance is (SumSq - (Sum+Sum/N)) /(N-1).
+
+sum([],0).
+sum([X|Xs],Res):- sum(Xs,REC), Res is REC +1.
+
+squares([],[]).
+squares([X|Xs],[Y|Ys]):- squares(Xs,Ys), Y is X*X.
+
