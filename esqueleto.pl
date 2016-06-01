@@ -119,6 +119,7 @@ meter_espacios([X|XS], YS) :- meter_espacios(XS, REC), append([X], REC, YS).
 
 
 % Ejercicio 10 %
+<<<<<<< HEAD
 mensajes_mas_parejos(S, M) :- descifrar_sin_espacios(S, M), dev_std(M, DSM), not((descifrar_sin_espacios(S, Y), dev_std(Y, DSY), DSM > DSY)).
 
 dev_std(M, DV) :- split_string(M, " ", "", L), stddev(L, DV).
@@ -144,3 +145,54 @@ squares([X|Xs],[Y|Ys]) :- squares(Xs,Ys), Y is X*X.
 
 ejemplo_1_1(S) :- cargar("dicc0.txt"), diccionario_lista(S).
 ejemplo_1_2 :- cargar("dicc0.txt"), diccionario_lista([108, 97]).
+=======
+
+mensajes_mas_parejos(XS, M, DESV) :- meter_espacios(XS, CIFER),lenPalabras(CIFER, LEN),stddev(LEN, DESV), descifrar(CIFER, M).
+
+%DESV para ver los desvios estandar.
+
+lenPalabras([],[0]).
+lenPalabras([espacio|Xs],[0|Rec]):-lenPalabras(Xs,Rec).
+lenPalabras([X|Xs],[Len|Y]):- X \= espacio, lenPalabras(Xs,[LenRec|Y]), Len is LenRec + 1.
+
+stddev(List, STddev) :- length(List,N),
+                        sum(List,Sum),
+                        squares(List,SqList),
+                        sum(SqList,SumSquares),
+                        variance(N,Sum,SumSquares,Varnaice),
+                        STddev = sqrt(Varnaice).
+
+variance(N,_,_;0):- N =< 1, !.
+variance(N,Sum,SumSq,Variance):-
+    Variance is (SumSq - (Sum+Sum/N)) /(N-1).
+
+sum([],0).
+sum([X|Xs],Res):- sum(Xs,REC), Res is REC +1.
+
+squares([],[]).
+squares([X|Xs],[Y|Ys]):- squares(Xs,Ys), Y is X*X.
+
+
+
+lenPalabras([],[0]).
+lenPalabras([espacio|Xs],[0|Rec]):-lenPalabras(Xs,Rec).
+lenPalabras([X|Xs],[Len|Y]):- X \= espacio, lenPalabras(Xs,[LenRec|Y]), Len is LenRec + 1.
+
+stddev(List, STddev) :- length(List,N),
+                        sum(List,Sum),
+                        squares(List,SqList),
+                        sum(SqList,SumSquares),
+                        variance(N,Sum,SumSquares,Varnaice),
+                        STddev = sqrt(Varnaice).
+
+variance(N,_,_;0):- N =< 1, !.
+variance(N,Sum,SumSq,Variance):-
+    Variance is (SumSq - (Sum+Sum/N)) /(N-1).
+
+sum([],0).
+sum([X|Xs],Res):- sum(Xs,REC), Res is REC +1.
+
+squares([],[]).
+squares([X|Xs],[Y|Ys]):- squares(Xs,Ys), Y is X*X.
+
+>>>>>>> origin/master
