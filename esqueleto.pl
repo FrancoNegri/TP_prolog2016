@@ -33,19 +33,23 @@ ej(4, [rombo, espacio, perro, espacio, sol, luna, espacio, estrella, espacio, ar
 
 % Ejercicio 1 %
 % diccionario_lista(-S) %
+% Si S esta instanciado indica si S esta en el diccionario %
+% Si S no esta instanciado, unifica a S con cada una de las palabras del diccionario %
 diccionario_lista(S) :- diccionario(D), string_codes(D, S).
 
 
 
 % Ejercicio 2 %
-% juntar_con(L, J, R) %
+% juntar_con(?L, ?J, ?R) %
+% Si L y R están sin instanciar, la función llama a append con los tres parámetros sin instanciar y, como este no recorre bien el espacio, tampoco lo hará juntar_con.
+% De modo que, L y R no puede estar sin instanciar al mismo tiempo.
 juntar_con([X], _, X).
-juntar_con([X|Xs], J, R) :- juntar_con(Xs, J, R2), append(X, [J|R2], R).
+juntar_con([X|Xs], J, R) :- append(X, [J|R2], R), juntar_con(Xs, J, R2).
 
 
 
 % Ejercicio 3 %
-% palabras(S, P) %
+% palabras(+S, ?P) %
 palabras([], []).
 palabras(S, P) :- append(PRE, [espacio|TPRE], S), not(member(espacio, PRE)), palabras(TPRE, P2), append([PRE], P2, P).
 palabras(S, [S]) :- not(member(espacio, S)).
@@ -115,3 +119,28 @@ meter_espacios([X|XS], YS) :- meter_espacios(XS, REC), append([X], REC, YS).
 
 
 % Ejercicio 10 %
+mensajes_mas_parejos(S, M) :- descifrar_sin_espacios(S, M), dev_std(M, DSM), not((descifrar_sin_espacios(S, Y), dev_std(Y, DSY), DSM > DSY)).
+
+dev_std(M, DV) :- split_string(M, " ", "", L), stddev(L, DV).
+
+stddev(List, STDdev) :- variance(List, Var), STDdev is sqrt(Var).
+
+variance([_], 1).
+variance(List, Var) :-  length(List,N),
+                        N > 1,
+                        longitudes(List, Longs),
+                        sum_list(Longs,Sum),
+                        squares(Longs,SqList),
+                        sum_list(SqList,SumSquares),
+                        Prom is Sum / N,
+                        PromSq is SumSquares / N,
+                        Var is PromSq - (Prom * Prom).
+
+longitudes([],[]).
+longitudes([X|Xs],[Y|Ys]) :- longitudes(Xs,Ys), string_length(X, Y).
+
+squares([],[]).
+squares([X|Xs],[Y|Ys]) :- squares(Xs,Ys), Y is X*X.
+
+ejemplo_1_1(S) :- cargar("dicc0.txt"), diccionario_lista(S).
+ejemplo_1_2 :- cargar("dicc0.txt"), diccionario_lista([108, 97]).
