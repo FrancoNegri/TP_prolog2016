@@ -57,7 +57,7 @@ palabras(S, [S]) :- not(member(espacio, S)).
 
 
 % Ejercicio 4 %
-asignar_var(Atomo, MI, [(Atomo, _) | MI]) :- not((member((Atomo, _), MI))),!.
+asignar_var(Atomo, MI, [(Atomo, _) | MI]) :- not((member((Atomo, _), MI))).
 asignar_var(Atomo, MI, MI) :- member((Atomo, _), MI).
 
 %testeo
@@ -69,14 +69,20 @@ testAs_v3:- asignar_var(rombo, [(cuadrado, _G4013),(rombo, _G4012)], [ (cuadrado
 %reversibilidad:
 %Primer argumento:
 %asignar_var(A, [], [(cuadrado, _G4012)]).
+%A = [] ;
+%A = [ (cuadrado, _G4012)]. 
+%No tendría que devolver esto!!
+
 %asignar_var(A, [(rombo, _G4012)], [(cuadrado, _G4013),(rombo, _G4012)]).
 %asignar_var(A, [(cuadrado, _G4013),(rombo, _G4012)], [ (cuadrado, _G4013), (rombo, _G4012)]).
 %La función sin el primer valor instanciado devolverá el valor esperado
 
+%segundo:
 %asignar_var(cuadrado, A, [(cuadrado, _G4012)]).
 %asignar_var(cuadrado, A, [(cuadrado, _G4013),(rombo, _G4012)]).
 %devuelve la lista sin el elemento agregado
 
+%ambos:
 %asignar_var(A, B, [(cuadrado, _G4012)]).
 %A = cuadrado,
 %B = [].
@@ -90,6 +96,10 @@ testAs_v3:- asignar_var(rombo, [(cuadrado, _G4013),(rombo, _G4012)], [ (cuadrado
 %este caso es medio turbio, B no tendría que asociar con C...
 
 %asignar_var(?A,?B,?C)
+%Si A esta sin instanciar, B y C instanciados, la función intentará unificar A con alguno de los elementos del mapeo C, tal que la union entre A y el mapeo de B resulten en C. 
+%Si B no esta instanciado, y A y C si, entonces la función intentará unificar a B con C habiendo quitado el elemnto A.
+%Si A y B no estan instanciados....
+
 
 % Ejercicio 5 %
 palabras_con_variables(S, V) :- diccionario_var(S, D), palabras_con_variables_y_dicc(S, D, V).
@@ -117,6 +127,10 @@ quitar(E, [X|XS], [X|R] ) :- not(X == E), quitar(E, XS, R).
 
 % Ejercicio 7 %
 % cant_distintos(?L, ?S) %
+%Si L esta instanciado y S no, devuelve la cantidad de elementos distintos de la lista
+%Si S esta instanciado y L no, como primer resultado devuelve una lista con S elementos distintos. Al pedirle otra solución la función quedará ciclando 
+%infinitamente explorando el arbol de soluciones en busca de otra lista con S elementos distintos.
+%Si S y L no estan instanciados, la función irá devolviendo una lista en S con L elementos distintos (es decir, la primera lista será la vacía, luego devolverá la lista con un elemento, luego la lista con dos elementos distintos, etc)
 cant_distintos([], 0).
 cant_distintos([X|XS], N) :- quitar(X, XS, XSsinX), cant_distintos(XSsinX, N2), N is N2+1.
 
