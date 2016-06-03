@@ -29,6 +29,13 @@ ej(3, [rombo, cuadrado, perro, cuadrado, sol, luna, triangulo, estrella, arbol, 
 
 ej(4, [rombo, espacio, perro, espacio, sol, luna, espacio, estrella, espacio, arbol, espacio, gato]).
 
+% Es el ej1 pero sin el espacio.
+ej(5, [rombo, cuadrado, perro, cuadrado, sol, cuadrado]).
+
+% Es el ej2 pero sin el espacio.
+ej(6, [rombo, cuadrado, perro, triangulo, sol, cuadrado]).
+
+
 
 
 % Ejercicio 1 %
@@ -36,6 +43,7 @@ ej(4, [rombo, espacio, perro, espacio, sol, luna, espacio, estrella, espacio, ar
 % Si S esta instanciado indica si S esta en el diccionario %
 % Si S no esta instanciado, unifica a S con cada una de las palabras del diccionario %
 diccionario_lista(S) :- diccionario(D), string_codes(D, S).
+
 
 
 
@@ -48,25 +56,35 @@ juntar_con([X|Xs], J, R) :- append(X, [J|R2], R), juntar_con(Xs, J, R2).
 
 
 
-% Ejercicio 3 %
-% palabras(+S, ?P) %
-palabras([], []).
+
+% Ejercicio 3
+% palabras(+S, ?P)
+% Si "S" no esta instanciado, "palabras" entra en un bucle infinito. Esto sucede por que el primer llamado a "append" no puede instanciar a "TPRE" puesto que "S" tampoco
+% esta instanciado y luego, se llama recursivamente a "palabras" con "TPRE" sin instanciar, generando así el bucle.
 palabras(S, P) :- append(PRE, [espacio|TPRE], S), not(member(espacio, PRE)), palabras(TPRE, P2), append([PRE], P2, P).
 palabras(S, [S]) :- not(member(espacio, S)).
 
+% Test ejercicio 3
+test_ej3 :- test_3_1, test_3_2, test_3_3, test_3_4, !.
+test_3_1 :- ej(1, S), palabras(S, [[rombo, cuadrado], [perro, cuadrado, sol, cuadrado]]).
+test_3_2 :- ej(3, S), palabras(S, [[rombo, cuadrado, perro, cuadrado, sol, luna, triangulo, estrella, arbol, gato]]).
+test_3_3 :- ej(4, S), palabras(S, [[rombo], [perro], [sol, luna], [estrella], [arbol], [gato]]).
+test_3_4 :- palabras([], [[]]).
 
 
-% Ejercicio 4 %
+
+
+% Ejercicio 4
 asignar_var(Atomo, MI, [(Atomo, _) | MI]) :- not((member((Atomo, _), MI))).
 asignar_var(Atomo, MI, MI) :- member((Atomo, _), MI).
 
-%testeo
-testsEj4:- testAs_v1, testAs_v2, testAs_v3.
-testAs_v1:- asignar_var(cuadrado, [], [(cuadrado, _G4012)]).
-testAs_v2:- asignar_var(cuadrado, [(rombo, _G4012)], [(cuadrado, _G4013),(rombo, _G4012)]).
-testAs_v3:- asignar_var(rombo, [(cuadrado, _G4013),(rombo, _G4012)], [ (cuadrado, _G4013), (rombo, _G4012)]).
+% Test ejercicio 4
+test_ej4 :- test_4_1, test_4_2, test_4_3, !.
+test_4_1 :- asignar_var(cuadrado, [], [(cuadrado, _G4012)]).
+test_4_2 :- asignar_var(cuadrado, [(rombo, _G4012)], [(cuadrado, _G4013),(rombo, _G4012)]).
+test_4_3 :- asignar_var(rombo, [(cuadrado, _G4013),(rombo, _G4012)], [ (cuadrado, _G4013), (rombo, _G4012)]).
 
-%reversibilidad:
+% Reversibilidad:
 %Primer argumento:
 %asignar_var(A, [], [(cuadrado, _G4012)]).
 %A = [] ;
@@ -101,6 +119,8 @@ testAs_v3:- asignar_var(rombo, [(cuadrado, _G4013),(rombo, _G4012)], [ (cuadrado
 %Si A y B no estan instanciados....
 
 
+
+
 % Ejercicio 5 %
 palabras_con_variables(S, V) :- diccionario_var(S, D), palabras_con_variables_y_dicc(S, D, V).
 
@@ -114,30 +134,47 @@ diccionario_var([ [] | XSS], DICC) :- diccionario_var(XSS, DICC).
 diccionario_var([ [X | XS] | XSS], DICC) :- diccionario_var([XS|XSS], DICC2), asignar_var(X, DICC2, DICC).
 
 
-% Ejercicio 6 %
-% quitar(?E, +L, -R) %
 
-quitar(_,[],[]).
-quitar(E, [X|XS], R) :- X==E, quitar(E, XS, R). 
+
+% Ejercicio 6
+% quitar(?E, +L, ?R)
+% Notar que aunque "E" no este instanciado, la función "quitar" no es reversible en "E". Si "E" no esta instanciado, "quitar" buscara a la variable pasada como
+% parámetro en la lista "L" y quitara todas sus ocurrencias.
+% El parámetro "L" debe estar instanciado y "R" puede estarlo o no.
+% En caso de que "R" este instanciado, "quitar" verificara si la instancia es correcta o no. En caso de que no este instanciado, "R" contendrá la solución.
+quitar(_, [], []).
+quitar(E, [X|XS], R) :- X == E, quitar(E, XS, R). 
 quitar(E, [X|XS], [X|R] ) :- not(X == E), quitar(E, XS, R).
 
-% Porque funciona "not(X == E)" ?? %
+% Test ejercicio 6
+test_ej6 :- test_6_1,  test_6_2, test_6_3, test_6_4, test_6_5, test_6_6, test_6_7, !.
+test_6_1 :- quitar(z, [A, B, A, z], [A, B, A]).
+test_6_2 :- quitar(A, [A, B, A, z], [B, z]).
+test_6_3 :- quitar(e, [A, q, w, B, E, d], [A, q, w, B, E, d]).
+test_6_4 :- quitar(F, [A, q, w, B, E, d], [A, q, w, B, E, d]).
+test_6_5 :- quitar(a, [], []).
+test_6_6 :- quitar(A, [], []).
+test_6_7 :- quitar(A, [A, A, A, A, A], []).
 
 
 
-% Ejercicio 7 %
-% cant_distintos(?L, ?S) %
-%Si L esta instanciado y S no, devuelve la cantidad de elementos distintos de la lista
-%Si S esta instanciado y L no, como primer resultado devuelve una lista con S elementos distintos. Al pedirle otra solución la función quedará ciclando 
-%infinitamente explorando el arbol de soluciones en busca de otra lista con S elementos distintos.
-%Si S y L no estan instanciados, la función irá devolviendo una lista en S con L elementos distintos (es decir, la primera lista será la vacía, luego devolverá la lista con un elemento, luego la lista con dos elementos distintos, etc)
+
+% Ejercicio 7
+% cant_distintos(+L, ?S)
+% Si L esta instanciado y S no, devuelve la cantidad de elementos distintos de la lista
+% Si S esta instanciado y L no, como primer resultado devuelve una lista con S elementos distintos. Al pedirle otra solución la función quedará ciclando 
+% infinitamente explorando el árbol de soluciones en busca de otra lista con S elementos distintos. Esto ocurre ya que "quitar" no soporta que el
+% segundo argumento no este instanciado.
+% Si S y L no están instanciados, la función irá devolviendo una lista en S con L elementos distintos (es decir, la primera lista será la vacía,
+% luego devolverá la lista con un elemento, luego la lista con dos elementos distintos, etc).
+% En resumen, "cant_distintos" no funciona solo en el caso en que "L" no esta instanciado y "S" si lo esta.
 cant_distintos([], 0).
 cant_distintos([X|XS], N) :- quitar(X, XS, XSsinX), cant_distintos(XSsinX, N2), N is N2+1.
 
-%testeo
-testsEj7:-testCD1,testCD2.
-testCD1:-cant_distintos([A,B,A], 2).
-testCD2:-cant_distintos([], 0).
+% Test ejercicio 7
+test_ej7 :- test_7_1, test_7_2, !.
+test_7_1 :- cant_distintos([A,B,A], 2).
+test_7_2 :- cant_distintos([], 0).
 
 %reversibilidad:
 %cant_distintos(A, 2).
@@ -175,12 +212,27 @@ to_string([XS], S) :- string_codes(S, XS).
 to_string([XS|XSS], S) :- length(XSS, N), N > 0, string_codes(S1, XS), to_string(XSS, S2), string_concat(' ', S2, S3), string_concat(S1, S3, S).
 
 
+
+
 % Ejercicio 9 %
+% descifrar_sin_espacios(+XS, ?M)
+% 
 descifrar_sin_espacios(XS, M) :- meter_espacios(XS, CIFER), descifrar(CIFER, M).
 
 meter_espacios([X], [X]).
 meter_espacios([X|XS], YS) :- meter_espacios(XS, REC), append([X, espacio], REC, YS).
 meter_espacios([X|XS], YS) :- meter_espacios(XS, REC), append([X], REC, YS).
+
+% Test ejercicio 9
+test_ej9 :- cargar("dicc1.txt"), test_9_1, test_9_2, test_9_3, cargar("dicc0.txt"), test_9_4, test_9_5, cargar("dicc0.txt"), test_9_6, !.
+test_9_1 :- ej(3, S), descifrar_sin_espacios(S, "casa de flor").
+test_9_2 :- ej(3, S), descifrar_sin_espacios(S, "casa flor de").
+test_9_3 :- ej(3, S), descifrar_sin_espacios(S, "casa miento").
+test_9_4 :- ej(5, S), descifrar_sin_espacios(S, "la casa").
+test_9_5 :- ej(5, S), descifrar_sin_espacios(S, "casa la").
+test_9_6 :- ej(6, S), descifrar_sin_espacios(S, "la cosa").
+
+
 
 
 % Ejercicio 10 %
