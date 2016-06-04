@@ -35,8 +35,13 @@ ej(5, [rombo, cuadrado, perro, cuadrado, sol, cuadrado]).
 % Es el ej2 pero sin el espacio.
 ej(6, [rombo, cuadrado, perro, triangulo, sol, cuadrado]).
 
+ej(7, [rombo, rombo, rombo, rombo, rombo, rombo]).
 
+% LA CASA EL COSA con dicc0
+ej(8, [rombo, cuadrado, espacio, perro, cuadrado, sol, cuadrado, espacio, luna, rombo, espacio, perro, gato, sol, cuadrado]).
 
+% flor de casa miento
+ej(9, [rombo, cuadrado, perro, gato, espacio, sol, triangulo, espacio, luna, arbol, casa, arbol, espacio, pelota, hada, triangulo, frutilla, torta, perro]).
 
 % Ejercicio 1 %
 % diccionario_lista(-S) %
@@ -51,9 +56,16 @@ diccionario_lista(S) :- diccionario(D), string_codes(D, S).
 % juntar_con(?L, ?J, ?R) %
 % Si L y R están sin instanciar, la función llama a append con los tres parámetros sin instanciar y, como este no recorre bien el espacio, tampoco lo hará juntar_con.
 % De modo que, L y R no puede estar sin instanciar al mismo tiempo.
+juntar_con([[]], J, []).
 juntar_con([X], _, X).
 juntar_con([X|Xs], J, R) :- append(X, [J|R2], R), juntar_con(Xs, J, R2).
 
+% Test ejercicio 2
+test_ej2 :- test_2_1, test_2_2, test_2_3, test_2_4, !.
+test_2_1 :- juntar_con([[x],[x, y],[z]], a, [x, a, x, y, a, z]).
+test_2_2 :- juntar_con([[x]], a, [x]).
+test_2_3 :- juntar_con([[x, y, z]], a, [x, y, z]).
+test_2_4 :- juntar_con([[]], a, []).
 
 
 
@@ -122,6 +134,20 @@ test_4_3 :- asignar_var(rombo, [(cuadrado, _G4013),(rombo, _G4012)], [ (cuadrado
 
 
 % Ejercicio 5 %
+% Reversibilidad:
+% palabras_con_variables(+S, ?V)
+% En la función diccionario_var(S, D), si el D está instanciado y es no vacío, entonces S no es
+% reversible.
+% En tal caso, se entra por la segunda regla y se agrega una lista vacía a S y se vuelve a llamar a
+% la misma funcion, pues en la llamada recursiva tambien entrará por la segunda regla y asi 
+% indefinidamente, por lo que nunca se va a unificar D.
+% En cambio si D no está instanciado o es vacío, entonces entra por la primera regla y 
+% devuelve la instancia de S, aunque solo se devuelve listas de listas vacías, 
+% ya que nunca entra a la tercera regla porque no termina de recorrer las soluciones de la
+% segunda regla.
+% Como el parametro S de la función diccionario_var es el parámetro S de palabras_con_variables,
+% entonces S es reversible si D no está instanciado o es vacío, aunque solo construye soluciones
+% en donde S es una lista de listas vacias.
 palabras_con_variables(S, V) :- diccionario_var(S, D), palabras_con_variables_y_dicc(S, D, V).
 
 palabras_con_variables_y_dicc([], _, []).
@@ -133,7 +159,13 @@ diccionario_var([], []).
 diccionario_var([ [] | XSS], DICC) :- diccionario_var(XSS, DICC).
 diccionario_var([ [X | XS] | XSS], DICC) :- diccionario_var([XS|XSS], DICC2), asignar_var(X, DICC2, DICC).
 
+% ej(1, S), palabras(S, P), diccionario_var(P, D), diccionario_var(X, D).
 
+% Test ejercicio 5
+test_ej5 :- test_5_1, test_5_2, test_5_3, !.
+test_5_1 :- ej(1, S), palabras(S, P), palabras_con_variables(P, [[X, Y], [Z, Y, W, V]]).
+test_5_2 :- ej(7, S), palabras(S, P), palabras_con_variables(P, [[X, X, X, X, X, X]]).
+test_5_3 :- palabras([], P), palabras_con_variables(P, [[]]).
 
 
 % Ejercicio 6
@@ -197,6 +229,12 @@ test_7_2 :- cant_distintos([], 0).
 
 
 % Ejercicio 8 %
+% Reversibilidad:
+% descifrar(+CIFER, ?MSJ)
+% CIFER debe estar instanciado pues palabras_con_variables necesita que su argumento P esté 
+% instanciado.Como P se obtiene a través de CIFER por palabras entonces P tampoco está instanciado,
+% con lo cual palabras_con_variables se cuelga salvo casos particulares aclarados en el
+% ejercicio 5.
 descifrar(CIFER, MSJ) :- palabras(CIFER, P), palabras_con_variables(P, VARS), flatten(VARS, VARSFLAT), sacar_repe(VARSFLAT, VARSNOREP), asignar(VARS), todos_distintos(VARSNOREP), to_string(VARS, MSJ).
 
 sacar_repe([], []).
@@ -211,7 +249,11 @@ to_string([], S) :- string_codes(S, []).
 to_string([XS], S) :- string_codes(S, XS).
 to_string([XS|XSS], S) :- length(XSS, N), N > 0, string_codes(S1, XS), to_string(XSS, S2), string_concat(' ', S2, S3), string_concat(S1, S3, S).
 
-
+% Test ejercicio 8
+test_ej8 :- test_8_1, test_8_2, test_8_3, !.
+test_8_1 :- cargar("dicc0.txt"), ej(1, S), descifrar(S, "la casa").
+test_8_2 :- cargar("dicc0.txt"), ej(8, S), descifrar(S, "la casa el cosa").
+test_8_3 :- cargar("dicc1.txt"), ej(9, S), descifrar(S, "flor de casa miento").
 
 
 % Ejercicio 9 %
