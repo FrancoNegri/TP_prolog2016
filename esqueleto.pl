@@ -251,6 +251,9 @@ test_9_6 :- ej(6, S), descifrar_sin_espacios(S, "la cosa").
 
 
 % Ejercicio 10 %
+% mensajes_mas_parejos(+S, -M)
+% Reversibilidad: S tiene que estar instanciado pues descifrar_sin_espacios necesita que S este instanciado
+% Por lo tanto mensajes_mas_parejos cuelga si S no está instanciado.
 mensajes_mas_parejos(S, M) :- descifrar_sin_espacios(S, M), dev_std(M, DSM), not((descifrar_sin_espacios(S, Y), dev_std(Y, DSY), DSM > DSY)).
 
 dev_std(M, DV) :- split_string(M, " ", "", L), stddev(L, DV).
@@ -275,7 +278,8 @@ squares([],[]).
 squares([X|Xs],[Y|Ys]) :- squares(Xs,Ys), Y is X*X.
 
 %testeo
-testsEj10:-testMMP1, testMMP2.
-testMMP1:- cargar("dicc1.txt"),mensajes_mas_parejos([rombo, cuadrado, perro, cuadrado, sol, luna, triangulo, estrella, arbol, gato], A), A = 'casa de flor'.
-testMMP2:- cargar("dicc1.txt"),mensajes_mas_parejos([rombo, cuadrado, perro, cuadrado, sol, luna, triangulo, estrella, arbol, gato], "casa flor de").
-%No le gusta!!
+tests_ej10 :- test_10_1, test_10_2, test_10_3, test_10_4, !.
+test_10_1 :- cargar("dicc1.txt"), ej(3, S), mensajes_mas_parejos(S, "casa de flor").
+test_10_2 :- cargar("dicc1.txt"), ej(3, S), mensajes_mas_parejos(S, "casa flor de").
+test_10_3 :- cargar("dicc0.txt"), ej(5, S), mensajes_mas_parejos(S, "la casa").
+test_10_4 :- cargar("dicc0.txt"), ej(5, S), mensajes_mas_parejos(S, "casa la").
