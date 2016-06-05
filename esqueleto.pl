@@ -228,6 +228,8 @@ test_7_2 :- cant_distintos([], 0).
 %luego, cant_distintos(A,B) es reversible exceptuando el caso A no instanciado y B si.
 
 
+
+
 % Ejercicio 8 %
 % Reversibilidad:
 % descifrar(+CIFER, ?MSJ)
@@ -256,9 +258,14 @@ test_8_2 :- cargar("dicc0.txt"), ej(8, S), descifrar(S, "la casa el cosa").
 test_8_3 :- cargar("dicc1.txt"), ej(9, S), descifrar(S, "flor de casa miento").
 
 
+
+
 % Ejercicio 9 %
 % descifrar_sin_espacios(+XS, ?M)
-% 
+% El parámetro XS debe estar instanciado pues "descifrar_sin_espacios" le agrega espacios (resultando en CIFER) y luego llama a "descifrar",
+% quien necesita que su primer parámetro este instanciado.
+% El parámetro se M unificara con todas las posibles soluciones en caso de no estar instanciado. En caso de estar instanciado se verificara
+% que dicha instancia unifique con alguna de las posibles soluciones.
 descifrar_sin_espacios(XS, M) :- meter_espacios(XS, CIFER), descifrar(CIFER, M).
 
 meter_espacios([X], [X]).
@@ -280,7 +287,7 @@ test_9_6 :- ej(6, S), descifrar_sin_espacios(S, "la cosa").
 % Ejercicio 10 %
 mensajes_mas_parejos(S, M) :- descifrar_sin_espacios(S, M), dev_std(M, DSM), not((descifrar_sin_espacios(S, Y), dev_std(Y, DSY), DSM > DSY)).
 
-dev_std(M, DV) :- juntar_con(L, ' ', M), stddev(L, DV).
+dev_std(M, DV) :- split_string(M, " ", "", L), stddev(L, DV).
 
 stddev(List, STDdev) :- variance(List, Var), STDdev is sqrt(Var).
 
