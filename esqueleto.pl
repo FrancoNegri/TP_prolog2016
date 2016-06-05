@@ -43,6 +43,10 @@ ej(8, [rombo, cuadrado, espacio, perro, cuadrado, sol, cuadrado, espacio, luna, 
 % flor de casa miento
 ej(9, [rombo, cuadrado, perro, gato, espacio, sol, triangulo, espacio, luna, arbol, casa, arbol, espacio, pelota, hada, triangulo, frutilla, torta, perro]).
 
+
+
+
+
 % Ejercicio 1 %
 % diccionario_lista(-S) %
 % Si S esta instanciado indica si S esta en el diccionario %
@@ -69,6 +73,7 @@ test_2_4 :- juntar_con([[]], a, []).
 
 
 
+
 % Ejercicio 3
 % palabras(+S, ?P)
 % Si "S" no esta instanciado, "palabras" entra en un bucle infinito. Esto sucede por que el primer llamado a "append" no puede instanciar a "TPRE" puesto que "S" tampoco
@@ -87,6 +92,14 @@ test_3_4 :- palabras([], [[]]).
 
 
 % Ejercicio 4
+% asignar_var(?A, ?B, ?C)
+% Si A no esta instanciado, y B y C están instanciados, la función intentará unificar A con alguno de los elementos del mapeo C, tal que la unión entre A y el mapeo de B resulten en C. 
+% Si B no esta instanciado, y A y C están instanciados, entonces la función intentará unificar a B con C y con C quitando el elemento A del mapeo de C.
+% Si C no esta instanciado, y A y B están instanciados, la función unificara a C con B o con el mapeo resultante de agregar A al mapeo de B en caso de que A no estuviera ya en el mapeo.
+% Si A y B no están instanciados, y C si lo esta, la función unificara a B con C y a A con cada elemento del mapeo de C. En este caso NO se generan todas las combinaciones posibles de unificaciones.
+% Si A y C no están instanciados, y B si lo esta, se unificara a C con B y a A con cada elemento del mapeo de B.
+% Si B y C no están instanciados, y A si lo esta, se generaran infinitos mapeos que contengan a A asignado a una variable..
+% Si ninguno esta instanciado, se generaran infinitos mapeos que tengan a A asignado a una variable.
 asignar_var(Atomo, MI, [(Atomo, _) | MI]) :- not((member((Atomo, _), MI))).
 asignar_var(Atomo, MI, MI) :- member((Atomo, _), MI).
 
@@ -96,39 +109,8 @@ test_4_1 :- asignar_var(cuadrado, [], [(cuadrado, _G4012)]).
 test_4_2 :- asignar_var(cuadrado, [(rombo, _G4012)], [(cuadrado, _G4013),(rombo, _G4012)]).
 test_4_3 :- asignar_var(rombo, [(cuadrado, _G4013),(rombo, _G4012)], [ (cuadrado, _G4013), (rombo, _G4012)]).
 
-% Reversibilidad:
-%Primer argumento:
-%asignar_var(A, [], [(cuadrado, _G4012)]).
-%A = [] ;
-%A = [ (cuadrado, _G4012)]. 
-%No tendría que devolver esto!!
+% ¿Por que funciona asignar_var/3? Porque Prolog asigna variables dinamicamente a los elementos que no estan instanciados para, luego, unificar dichas variables en caso de necesitarlo.
 
-%asignar_var(A, [(rombo, _G4012)], [(cuadrado, _G4013),(rombo, _G4012)]).
-%asignar_var(A, [(cuadrado, _G4013),(rombo, _G4012)], [ (cuadrado, _G4013), (rombo, _G4012)]).
-%La función sin el primer valor instanciado devolverá el valor esperado
-
-%segundo:
-%asignar_var(cuadrado, A, [(cuadrado, _G4012)]).
-%asignar_var(cuadrado, A, [(cuadrado, _G4013),(rombo, _G4012)]).
-%devuelve la lista sin el elemento agregado
-
-%ambos:
-%asignar_var(A, B, [(cuadrado, _G4012)]).
-%A = cuadrado,
-%B = [].
-
-%asignar_var(A,B,C).
-%B = C, C = [ (A, _G24)|_G27] ;
-%B = C, C = [_G26, (A, _G24)|_G30] ;
-%B = C, C = [_G26, _G29, (A, _G24)|_G33] ;
-%B = C, C = [_G26, _G29, _G32, (A, _G24)|_G36] ;
-%...
-%este caso es medio turbio, B no tendría que asociar con C...
-
-%asignar_var(?A,?B,?C)
-%Si A esta sin instanciar, B y C instanciados, la función intentará unificar A con alguno de los elementos del mapeo C, tal que la union entre A y el mapeo de B resulten en C. 
-%Si B no esta instanciado, y A y C si, entonces la función intentará unificar a B con C habiendo quitado el elemnto A.
-%Si A y B no estan instanciados....
 
 
 
@@ -139,15 +121,15 @@ test_4_3 :- asignar_var(rombo, [(cuadrado, _G4013),(rombo, _G4012)], [ (cuadrado
 % En la función diccionario_var(S, D), si el D está instanciado y es no vacío, entonces S no es
 % reversible.
 % En tal caso, se entra por la segunda regla y se agrega una lista vacía a S y se vuelve a llamar a
-% la misma funcion, pues en la llamada recursiva tambien entrará por la segunda regla y asi 
+% la misma función, pues en la llamada recursiva también entrará por la segunda regla y asi 
 % indefinidamente, por lo que nunca se va a unificar D.
 % En cambio si D no está instanciado o es vacío, entonces entra por la primera regla y 
 % devuelve la instancia de S, aunque solo se devuelve listas de listas vacías, 
 % ya que nunca entra a la tercera regla porque no termina de recorrer las soluciones de la
 % segunda regla.
-% Como el parametro S de la función diccionario_var es el parámetro S de palabras_con_variables,
+% Como el parámetro S de la función diccionario_var es el parámetro S de palabras_con_variables,
 % entonces S es reversible si D no está instanciado o es vacío, aunque solo construye soluciones
-% en donde S es una lista de listas vacias.
+% en donde S es una lista de listas vaciás.
 palabras_con_variables(S, V) :- diccionario_var(S, D), palabras_con_variables_y_dicc(S, D, V).
 
 palabras_con_variables_y_dicc([], _, []).
@@ -166,6 +148,8 @@ test_ej5 :- test_5_1, test_5_2, test_5_3, !.
 test_5_1 :- ej(1, S), palabras(S, P), palabras_con_variables(P, [[X, Y], [Z, Y, W, V]]).
 test_5_2 :- ej(7, S), palabras(S, P), palabras_con_variables(P, [[X, X, X, X, X, X]]).
 test_5_3 :- palabras([], P), palabras_con_variables(P, [[]]).
+
+
 
 
 % Ejercicio 6
@@ -208,24 +192,6 @@ test_ej7 :- test_7_1, test_7_2, !.
 test_7_1 :- cant_distintos([A,B,A], 2).
 test_7_2 :- cant_distintos([], 0).
 
-%reversibilidad:
-%cant_distintos(A, 2).
-%A = [_G267, _G270].
-%luego cuelga buscando mas soluciones
-%cant_distintos(A, 0).
-%A =[].
-%luego cuelga buscando mas soluciones
-%cant_distintos(A, B).
-%A = [],
-%B = 0 ;
-%A = [_G282],
-%B = 1 ;
-%A = [_G282, _G285],
-%B = 2 ;
-%A = [_G282, _G285, _G297],
-%B = 3 ;
-%...
-%luego, cant_distintos(A,B) es reversible exceptuando el caso A no instanciado y B si.
 
 
 
